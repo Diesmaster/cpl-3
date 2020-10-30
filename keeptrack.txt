@@ -1,0 +1,52 @@
+public void PickUp(int i){
+  lock.lock();
+  try{
+
+    state[i] = States.hungry;
+
+    if( ( state[(i-1+numOfWizzards)%numOfWizzards] != States.eating ) &&
+        (state[(i+1)%numOfWizzards] != States.eating) ){
+      System.out.format("Wizzards %d picks up left chopstick\n", i+1);
+      System.out.format("Wizzards %d picks up right chopstick\n", i+1);
+      state[i] = States.eating;
+    }
+    else {
+      try {
+        cond[i].await();
+
+        System.out.format("Wizzards %d picks up left chopstick\n", i+1);
+        System.out.format("Wizzards %d picks up right chopstick\n", i+1);
+        state[i] = States.eating;
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+    }
+  }
+  finally{
+    lock.unlock();
+  }
+}
+
+public void PutDown(int i){
+  lock.lock();
+  try{
+    System.out.format("Wizzards %d puts down right chopstick\n", i+1);
+    System.out.format("Wizzards %d puts down left chopstick\n", i+1);
+    state[i] = States.thinking;
+
+    int left = (i - 1 + numOfWizzards)%numOfWizzards;
+    int left2 = (i - 2 + numOfWizzards)%numOfWizzards;
+    if( (state[left] == States.hungry) &&
+      (state[left2] != States.eating) ){
+      cond[left].signal();
+    }
+
+    if( (state[(i+1)%numOfWizzards] == States.hungry) &&
+      (state[(i+2)%numOfWizzards] != States.eating) ){
+      cond[(i+1)%numOfWizzards].signal();
+    }
+  }
+  finally {
+    lock.unlock();
+  }
+}
