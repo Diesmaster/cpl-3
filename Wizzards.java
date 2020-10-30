@@ -99,13 +99,13 @@ public class Wizzards implements Runnable {
 		int count = 1;
 		while(count <= apprenticies ){
 			mon.trytocast(myId);
-			eat(count);
+			cast(count);
 			mon.stopcasting(myId);
 			++count;
 		}
 	}
 
-	void eat(int count){
+	void cast(int count){
 		System.out.format("Wizzards %d casts (%d times)\n", myId+1, count);
 		try {
 		    Thread.sleep(sleepLength);
